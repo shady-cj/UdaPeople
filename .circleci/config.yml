@@ -226,17 +226,45 @@ jobs:
 
   deploy_frontend:
     docker:
-      - image: amazon/aws-cli
+      - image: python:3.7-alpine3.16
     steps:
       - checkout
       - attach_workspace:
           at: ./
-          #- run:
-        #name: Install node and npm
-          #command:
-          # - run: 
-        # name: Install python and ansible
-          # command: 
+      - restore_cache:
+          keys: [frontend-build]
+      - run:
+          name: Install node and npm
+          command:  apk add --update nodejs npm
+      - run: 
+          name: Install  ansible and awscli
+          command: |
+            apk add --update ansible
+            pip install awscli
+      - run:
+          name: get backend url
+          command: |
+            export BACKEND_IP=$(aws --region us-east-1 ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "API_URL = ${API_URL}"
+            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            cat frontend/.env
+      - run: 
+          name: deploy frontend objects
+          command: |
+            cd frontend
+            npm install
+            npm run build
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+     
+      - destroy-environment:                                                                      frontend: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"                                backend: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
+
+  deploy_backend:
+    docker:
+      - image: python:3.7-alpine3.16
+    steps:
+      - checkout
 workflows:
   Main-Workflow:
     jobs:
@@ -256,3 +284,10 @@ workflows:
       - configure_infrastructure:
           requires:
             - deploy_infrastructure
+      - run_migrations:
+          requires:
+            - configure_infrastructure
+      - deploy_frontend:
+          requires:
+            - run_migrations
+
