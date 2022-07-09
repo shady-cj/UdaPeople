@@ -176,7 +176,29 @@ jobs:
           #template: basic_fail_1
           # - slack/notify:
           #event: pass
-          #template: success_tagged_deploy_1 
+          #template: success_tagged_deploy_1
+  configure_infrastructure:
+    docker:
+      - image: python:3.7-alpine3.16
+
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ./
+      - add_ssh_keys:
+          fingerprints: ["93:81:a0:52:33:d7:30:72:d5:e6:6b:4a:3c:6f:eb:aa"]
+      - run:
+          name: install ansible and other dependencies
+          command: |
+            apk add --update ansible
+            pip install awscli
+            yum install -y gzip tar
+      - run:
+          name: execute ansible playbook
+          command: |
+            cd ./.circleci/ansible
+            ansible-playbook -i inventory.txt configure-server.yml
+
 workflows:
   Main-Workflow:
     jobs:
