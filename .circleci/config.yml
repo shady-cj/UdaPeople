@@ -141,11 +141,6 @@ jobs:
           name: installing tar and gzip utility
           command: yum install gzip tar -y
       - run:
-          name: Showing the directories
-          command: |
-            aws s3 ls
-            aws cloudformation describe-stacks
-      - run:
           name: deploy backend infrastructure
           command: |
             aws cloudformation deploy \
