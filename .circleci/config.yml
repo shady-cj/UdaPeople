@@ -86,7 +86,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          - keys:
+          keys:
             -  backend-build
       - run: 
           name: backend testing
