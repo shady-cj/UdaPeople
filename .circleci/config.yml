@@ -153,8 +153,8 @@ jobs:
           command: |
             aws cloudformation deploy \
             --template-file .circleci/files/frontend.yml \
-            --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
-            --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+            --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
             --tags project=udapeople
       - run:
           name: Getting the ec2 instance ip
@@ -163,12 +163,7 @@ jobs:
             --query 'Reservations[*].Instances[*].PublicIpAddress' \
             --filters "Name=tag:Project,Values=udacity" \
             --output text >> .circleci/ansible/inventory.txt
-      - slack/notify: 
-          event: fail
-          template: basic_fail_1
-      - slack/notify:
-          event: pass
-          template: success_tagged_deploy_1 
+       
       - persist_to_workspace:
           root: ./
           paths:
@@ -176,6 +171,12 @@ jobs:
       - destroy-environment:
           frontend: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
           backend: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
+      - slack/notify: 
+          event: fail
+          template: basic_fail_1
+      - slack/notify:
+          event: pass
+          template: success_tagged_deploy_1 
 workflows:
   Main-Workflow:
     jobs:
