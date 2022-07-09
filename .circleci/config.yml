@@ -141,6 +141,14 @@ jobs:
           name: installing tar and gzip utility
           command: yum install gzip tar -y
       - run:
+          name: Showing the directories
+          command: |
+            readlink -f ~/
+            echo "home content"
+            ls ~/
+            pwd
+            ls -al
+      - run:
           name: deploy backend infrastructure
           command: |
             aws cloudformation deploy \
@@ -170,9 +178,9 @@ jobs:
           event: pass
           template: success_tagged_deploy_1 
       - persist_to_workspace:
-          root: ~/
+          root: ./
           paths:
-            - ~/.circleci/ansible/inventory.txt
+            - ./.circleci/ansible/inventory.txt
       - destroy-environment:
           frontend: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
           backend: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
