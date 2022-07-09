@@ -223,6 +223,20 @@ jobs:
              then
                   curl https://kvdb.io/Pu1GBvPYKAkwEbveutmNYw/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
              fi
+
+  deploy_frontend:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ./
+      - run:
+          name: Install node and npm
+          command:
+      - run: 
+          name: Install python and ansible
+          command: 
 workflows:
   Main-Workflow:
     jobs:
