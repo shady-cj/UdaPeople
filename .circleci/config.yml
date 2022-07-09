@@ -161,7 +161,7 @@ jobs:
           command: |
             aws --region us-east-1 ec2 describe-instances \
             --query 'Reservations[*].Instances[*].PublicIpAddress' \
-            --filters "Name=tag:Project,Values=udacity" \
+            --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
             --output text >> .circleci/ansible/inventory.txt
             cat .circleci/ansible/inventory.txt
        
@@ -231,12 +231,12 @@ jobs:
       - checkout
       - attach_workspace:
           at: ./
-      - run:
-          name: Install node and npm
-          command:
-      - run: 
-          name: Install python and ansible
-          command: 
+          #- run:
+        #name: Install node and npm
+          #command:
+          # - run: 
+        # name: Install python and ansible
+          # command: 
 workflows:
   Main-Workflow:
     jobs:
