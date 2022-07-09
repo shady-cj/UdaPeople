@@ -215,3 +215,6 @@ workflows:
       - deploy_infrastructure:
         #context: slack-secrets
           requires: [scan_frontend, scan_backend, test_frontend, test_backend]
+      - configure_infrastructure:
+          requires:
+            - deploy_infrastructure
