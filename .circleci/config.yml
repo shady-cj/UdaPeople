@@ -143,11 +143,8 @@ jobs:
       - run:
           name: Showing the directories
           command: |
-            readlink -f ~/
-            echo "home content"
-            ls ~/
-            pwd
-            ls -al
+            aws s3 ls
+            aws cloudformation describe-stacks
       - run:
           name: deploy backend infrastructure
           command: |
