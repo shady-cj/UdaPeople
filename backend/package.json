@@ -4,8 +4,8 @@
   "description": "This is just a test.",
   "author": "",
   "license": "MIT",
-  "class-validator": "0.12.2"
-  "standard-version": "^7.0.0"
+  "class-validator": "0.12.2",
+  "standard-version": "^7.0.0",
   "scripts": {
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\"",
