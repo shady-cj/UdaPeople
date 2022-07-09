@@ -192,7 +192,6 @@ jobs:
           command: |
             apk add --update ansible
             pip install awscli
-            yum install -y gzip tar
       - run:
           name: execute ansible playbook
           command: |
