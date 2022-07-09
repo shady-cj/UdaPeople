@@ -22,7 +22,6 @@
         name: ["python"]
         state: latest
         update_cache: yes
-      # Your code here
 
   # Get the environment variables from CircleCI and add to the EC2 instance
   environment:
@@ -37,5 +36,5 @@
     - TYPEORM_MIGRATIONS_DIR: "{{ lookup('env', 'TYPEORM_MIGRATIONS_DIR') }}"
 
   roles:
-    setup
+    - setup
     # Your code here
