@@ -131,6 +131,7 @@ jobs:
             npm audit fix --audit-level=critical --force
             npm audit fix --force
             npm audit --audit-level=critical
+
   deploy_infrastructure:
     docker:
       - image: amazon/aws-cli
