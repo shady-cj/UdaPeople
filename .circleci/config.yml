@@ -7,14 +7,17 @@ commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
-      # Add parameter here   
+      frontend:
+        type: string
+      backend: 
+        type: string
     steps:
       - run:
           name: Destroy environments
           when: on_fail
           command: |
-            # Your code here
-            exit 1
+            aws cloudformation delete-stack --stack-name << parameters.frontend >>
+            aws cloudformation delete-stack --stack-name << parameters.backend >>
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
@@ -69,12 +72,7 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
-      - slack/notify: 
-          event: fail
-          template: basic_fail_1
-      - slack/notify:
-          event: pass
-          template: success_tagged_deploy_1
+      
 
   test_frontend:
     docker:
@@ -133,12 +131,55 @@ jobs:
             npm audit fix --audit-level=critical --force
             npm audit fix --force
             npm audit --audit-level=critical
+  deploy_infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: installing tar and gzip utility
+          command: yum install gzip tar -y
+      - run:
+          name: deploy backend infrastructure
+          command: |
+            aws cloudformation deploy \
+            --template-file .circleci/files/backend.yml \
+            --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
+            --tags project=udapeople
+      - run:
+          name: deploy frontend infrastructure
+          command: |
+            aws cloudformation deploy \
+            --template-file .circleci/files/frontend.yml \
+            --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
+            --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+            --tags project=udapeople
+      - run:
+          name: Getting the ec2 instance ip
+          command: |
+            aws --region us-east-1 ec2 describe-instances \
+            --query 'Reservations[*].Instances[*].PublicIpAddress' \
+            --filters "Name=tag:Project,Values=udacity" \
+            --output text >> .circleci/ansible/inventory.txt
+      - slack/notify: 
+          event: fail
+          template: basic_fail_1
+      - slack/notify:
+          event: pass
+          template: success_tagged_deploy_1 
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - ~/.circleci/ansible/inventory.txt
+      - destroy-environment:
+          frontend: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
+          backend: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
 workflows:
   Main-Workflow:
     jobs:
       - build_frontend
-      - build_backend:
-          context: slack-secrets
+      - build_backend
       - test_frontend:
           requires: [build_frontend]
       - test_backend:
@@ -147,3 +188,6 @@ workflows:
           requires: [build_frontend]
       - scan_backend:
           requires: [build_backend]
+      - deploy_infrastructure:
+          context: slack-secrets
+          requires: [scan_frontend, scan_backend, test_frontend, test_backend]
