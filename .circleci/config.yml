@@ -429,7 +429,7 @@ workflows:
           requires: [scan_frontend, scan_backend, test_frontend, test_backend]
           filters:
             branches:
-              only: [master]
+              only: [main]
       - configure_infrastructure:
           requires:
             - deploy_infrastructure
