@@ -277,6 +277,8 @@ jobs:
           fingerprints: ["93:81:a0:52:33:d7:30:72:d5:e6:6b:4a:3c:6f:eb:aa"]
       - attach_workspace:
           at: ./
+      - restore_cache:
+          keys: [backend-build]
       - run:
           name: install dependencies
           command: |
@@ -316,7 +318,7 @@ jobs:
       - run:
           name: Run smoke tests for backend
           command: |
-            export BACKEND_API="http://$(tail -n 1./.circleci/ansible/inventory.txt):3030"
+            export BACKEND_API="http://$(tail -n 1 ./.circleci/ansible/inventory.txt):3030"
             echo $BACKEND_API
             if curl "${BACKEND_API}/api/status" | grep -i "ok"
             then
