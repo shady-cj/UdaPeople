@@ -411,13 +411,12 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
-      - attach_workspace:
-          at: ./
       - run:
           name: Install dependencies
           command: | 
             yum install gzip tar -y
-            
+      - attach_workspace:
+          at: ./
       - run:
           name: decide on whether to remove the old workflow or not
           command: |
