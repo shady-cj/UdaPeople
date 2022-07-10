@@ -314,5 +314,5 @@ workflows:
               #- configure_infrastructure
       - deploy_frontend:
           requires:
-            - run_migrations
-
+            # - run_migrations
+            - configure_infrastructure
