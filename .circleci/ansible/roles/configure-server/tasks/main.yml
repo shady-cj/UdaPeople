@@ -8,11 +8,6 @@
   apt:
     upgrade: yes
 
-- name: "Remove dependencies that are no longer required"
-  become: true
-  apt:
-    autoremove: yes
-
 - name: "install dependencies"
   become: true
   apt:

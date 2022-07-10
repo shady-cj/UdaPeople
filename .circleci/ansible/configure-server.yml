@@ -29,6 +29,7 @@
 
   # Get the environment variables from CircleCI and add to the EC2 instance
   environment:
+    - ENVIRONMENT: production
     - TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION')}}"  
     - TYPEORM_ENTITIES: "{{ lookup('env', 'TYPEORM_ENTITIES') }}"
     - TYPEORM_HOST: "{{ lookup('env', 'TYPEORM_HOST')}}"
@@ -40,5 +41,5 @@
     - TYPEORM_MIGRATIONS_DIR: "{{ lookup('env', 'TYPEORM_MIGRATIONS_DIR') }}"
 
   roles:
-    - setup
+    - configure-server
     # Your code here
