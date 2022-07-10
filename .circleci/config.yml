@@ -315,6 +315,8 @@ jobs:
             npm run build
             cd .. 
             tar -C backend -czvf artifact.tar.gz .
+            ls
+            pwd
             cd .circleci/ansible
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
@@ -380,6 +382,35 @@ jobs:
             --stack-name InitialStack \
             --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
             --tags project=udapeople
+
+  cleanup:
+    docker: 
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Grabbing oldworkflow id
+          command: | 
+            export OldWorkflowID=$(aws cloudformation \
+            list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+            --no-paginate --output text)
+            echo OldWorkflowID: "${OldWorkflowID}"
+            echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
+
+            export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
+            --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
+            echo Stack names: "${STACKS[@]}"
+      - run:
+          name: decide on whether to remove the old workflow or not
+          command:
+            if [[ "${CIRCLE_WORKFLOW_ID:0:7}" =~ "${OldWorkflowID}" ]]
+            then
+              s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
+              aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
+              aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
+            else
+              echo "----------An error occured while cleaning up----------------"
+            fi
 workflows:
   Main-Workflow:
     jobs:
@@ -396,6 +427,9 @@ workflows:
       - deploy_infrastructure:
         #context: slack-secrets
           requires: [scan_frontend, scan_backend, test_frontend, test_backend]
+          filters:
+            branches:
+              only: [master]
       - configure_infrastructure:
           requires:
             - deploy_infrastructure

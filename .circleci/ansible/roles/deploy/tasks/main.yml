@@ -1,11 +1,12 @@
 - name: copy the artifacts to the remote server
   copy:
-    src: "/root/project/artifact.tar.gz"
+    src: "~/poject/artifact.tar.gz"
     dest: ~/
 
 - name:
   shell: |
     cd ~/
+    ls
     tar -zxf artifact.tar.gz
     npm install
     pm2 stop default
