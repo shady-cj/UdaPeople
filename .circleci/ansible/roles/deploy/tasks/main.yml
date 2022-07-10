@@ -5,9 +5,8 @@
 
 - name:
   shell: |
-    cd /home/ubuntu
-    ls
-    tar -zxf artifact.tar.gz
-    npm install
-    pm2 stop default
-    pm2 start npm -- start
+    sudo cd /home/ubuntu
+    sudo tar -zxf artifact.tar.gz
+    sudo npm install
+    sudo pm2 stop default
+    sudo pm2 start npm -- start
