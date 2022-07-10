@@ -375,34 +375,49 @@ jobs:
     steps:
       - checkout
       - run:
+          name: install dependency
+          command:
+            yum install tar gzip -y
+      - run: 
+          name: Grabbing oldworkflow id
+          command: 
+            aws cloudformation \
+            list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+            --no-paginate --output text > oldworkflowid.txt
+            cat oldworkflowid.txt
+      - run:
           name: promotes frontend to production
           command: |
             aws cloudformation deploy \
             --template-file .circleci/files/cloudfront.yml \
-            --stack-name InitialStack \
+            --stack-name initialStack \
             --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
             --tags project=udapeople
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - ./oldworkflowid.txt
+
+
 
   cleanup:
     docker: 
       - image: amazon/aws-cli
     steps:
       - checkout
+      - attach_workspace:
+          at: ./
       - run:
-          name: Grabbing oldworkflow id
+          name: Install dependencies
           command: | 
-            export OldWorkflowID=$(aws cloudformation \
-            list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
-            --no-paginate --output text)
-            echo OldWorkflowID: "${OldWorkflowID}"
-            echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
-
-            export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
-            --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
-            echo Stack names: "${STACKS[@]}"
+            yum install gzip tar -y
+            
       - run:
           name: decide on whether to remove the old workflow or not
           command:
+            OldWorkflowID=$(cat ./oldworkflowid.txt)
+            echo $OldWorkflowID
+            echo "${CIRCLE_WORKFLOW_ID:0:7}"
             if [[ "${CIRCLE_WORKFLOW_ID:0:7}" =~ "${OldWorkflowID}" ]]
             then
               s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
@@ -444,11 +459,13 @@ workflows:
             - run_migrations
 
 
-      - smoke_test:
-          requires:
-            - deploy_frontend
-            - deploy_backend
+              # - smoke_test:
+              #requires:
+              # - deploy_frontend
+              # - deploy_backend
       - cloudfront_update:
           requires:
             - deploy_frontend
-
+      - cleanup:
+          requires:
+            - cloudfront_update
