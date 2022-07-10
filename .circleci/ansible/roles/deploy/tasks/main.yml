@@ -1,11 +1,11 @@
 - name: copy the artifacts to the remote server
   copy:
     src: "~/project/artifact.tar.gz"
-    dest: ~/
+    dest: /home/ubuntu
 
 - name:
   shell: |
-    cd ~/
+    cd /home/ubuntu
     ls
     tar -zxf artifact.tar.gz
     npm install
