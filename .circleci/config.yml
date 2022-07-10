@@ -376,11 +376,11 @@ jobs:
       - checkout
       - run:
           name: install dependency
-          command:
+          command: |
             yum install tar gzip -y
       - run: 
           name: Grabbing oldworkflow id
-          command: 
+          command: | 
             aws cloudformation \
             list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
             --no-paginate --output text > oldworkflowid.txt
@@ -398,7 +398,13 @@ jobs:
           paths:
             - ./oldworkflowid.txt
 
+      - destroy-environment:                                                          
+          frontend: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"                    
+          backend: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"                      
+          bucket_id: "${CIRCLE_WORKFLOW_ID:0:7}"
 
+      - revert-migrations:                                                            
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
 
   cleanup:
     docker: 
@@ -414,7 +420,7 @@ jobs:
             
       - run:
           name: decide on whether to remove the old workflow or not
-          command:
+          command: |
             OldWorkflowID=$(cat ./oldworkflowid.txt)
             echo $OldWorkflowID
             echo "${CIRCLE_WORKFLOW_ID:0:7}"
@@ -426,6 +432,13 @@ jobs:
             else
               echo "----------An error occured while cleaning up----------------"
             fi
+      - destroy-environment:                                                          
+          frontend: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"                    
+          backend: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"                      
+          bucket_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+
+      - revert-migrations:                                                          
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
 workflows:
   Main-Workflow:
     jobs:
