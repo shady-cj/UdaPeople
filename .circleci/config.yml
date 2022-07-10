@@ -416,5 +416,5 @@ workflows:
             - deploy_backend
       - cloud_front:
           requires:
-            - deploy-frontend
+            - deploy_frontend
 
