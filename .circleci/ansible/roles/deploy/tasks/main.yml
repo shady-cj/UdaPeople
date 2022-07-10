@@ -1,6 +1,6 @@
 - name: copy the artifacts to the remote server
   copy:
-    src: "~/poject/artifact.tar.gz"
+    src: "~/project/artifact.tar.gz"
     dest: ~/
 
 - name:
