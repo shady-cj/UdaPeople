@@ -310,7 +310,7 @@ jobs:
       - run: 
           name: Install dependencies
           command: |
-            pip install aws-cli
+            pip install awscli
             apk add --update nodejs npm
             apk add --update curl
       - run:
