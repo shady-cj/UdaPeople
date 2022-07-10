@@ -19,8 +19,8 @@ commands:
           when: on_fail
           command: |
             aws s3 rm "s3://udapeople-<< parameters.bucket_id >>" --recursive
-            aws cloudformation delete-stack --stack-name << parameters.frontend >>
             aws cloudformation delete-stack --stack-name << parameters.backend >>
+            aws cloudformation delete-stack --stack-name << parameters.frontend >>
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
@@ -313,9 +313,9 @@ jobs:
             cd backend
             npm install
             npm run build
-
+            cd .. 
             tar -C backend -czvf artifact.tar.gz
-            cd ../.circleci/ansible
+            cd .circleci/ansible
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
