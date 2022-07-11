@@ -231,7 +231,7 @@ jobs:
             cd backend
             npm install
             echo "------installed------"
-            npm run migrations > migrations_dump.txt
+            npm run migrations --force > migrations_dump.txt
             echo
             echo
             echo "------done echo------"
