@@ -480,6 +480,7 @@ workflows:
       - cloudfront_update:
           requires:
             - deploy_frontend
+            - deploy_backend
       - cleanup:
           requires:
             - cloudfront_update
