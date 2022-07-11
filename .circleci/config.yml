@@ -223,7 +223,7 @@ jobs:
           name: Install dependencies
           command: |
             pip install awscli
-            apk add --update nodejs npm
+            apk add --update nodejs npm openssh-client git
             apk add --update curl
       - run:
           name: Run migrations
