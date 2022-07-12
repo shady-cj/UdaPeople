@@ -1,1 +1,1 @@
-Link to the prometheus server - http://ec2-54-226-54-47.compute-1.amazonaws.com:9090
+Link to the prometheus server - http://ec2-3-80-120-106.compute-1.amazonaws.com:9090

@@ -1,1 +1,1 @@
-Link to my s3 bucket - http://udapeople-082c680.s3-website-us-east-1.amazonaws.com/
+Link to my s3 bucket - http://udapeople-7f6e848.s3-website-us-east-1.amazonaws.com
