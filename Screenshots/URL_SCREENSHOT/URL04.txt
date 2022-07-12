@@ -1,1 +1,1 @@
-Link to my backend ec2 instance - http://ec2-3-88-194-245.compute-1.amazonaws.com:3030/api/status
+Link to my backend ec2 instance - http://ec2-3-84-220-158.compute-1.amazonaws.com:3030/api/status
